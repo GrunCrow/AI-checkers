@@ -3,11 +3,11 @@ from .constants import BLACK, ROWS, SQUARE_SIZE, COLS, WHITE
 from .piece import Piece
 
 
-def subs(white_evaluation, black_evaluation, color):
+def subs(white_evaluation, black_evaluation, colour):
 
-    if color == WHITE:
+    if colour == WHITE:
         return white_evaluation - black_evaluation
-    elif color == BLACK:
+    elif colour == BLACK:
         return black_evaluation - white_evaluation
 
     return 0
@@ -39,18 +39,23 @@ class Board:
 
     # Evaluation functions: evaluate the current state of the board
 
-    def evaluate_function_1(self, color):  # Piece to value
+    def evaluate_function_1(self, colour):  # Piece to value
         # score based on the number of pieces left
         white_evaluation = self.white_left + self.white_kings * 0.5
+        if self.winner() is WHITE:
+            white_evaluation += 250
         black_evaluation = self.black_left + self.black_kings * 0.5
+        if self.winner() is WHITE:
+            black_evaluation += 250
 
-        return subs(color, white_evaluation, black_evaluation)
+        return subs(colour, white_evaluation, black_evaluation)
 
 
-    def evaluate_function_2(self, color):
+    def evaluate_function_2(self, colour):
         # Pawn in the opponent's half of the board value = 7
         # Pawn in the player's half of the board value = 5
         # King’s value = 10
+        # win = 250
 
         white_evaluation = black_evaluation = 0
         white_pieces = self.get_all_pieces(WHITE)
@@ -65,6 +70,9 @@ class Board:
 
         for white_piece in white_pieces:
             aux = 0
+            if self.winner() is WHITE:
+                aux += 250
+
             if white_piece.king:    # if king
                 aux += 10
             else:
@@ -77,6 +85,9 @@ class Board:
 
         for black_piece in black_pieces:
             aux = 0
+            if self.winner() is BLACK:
+                aux += 250
+
             if black_piece.king:  # if king
                 aux += 10
             else:
@@ -87,11 +98,7 @@ class Board:
 
             black_evaluation += aux
 
-        new_aux = color
-        aux_white = WHITE
-        aux_black = BLACK
-
-        return subs(white_evaluation, black_evaluation, color)
+        return subs(white_evaluation, black_evaluation, colour)
 
         '''
         This function is built over the Piece to Value function.

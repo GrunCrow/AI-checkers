@@ -2,6 +2,7 @@ import pygame
 from checkers.constants import WIDTH, HEIGHT, SQUARE_SIZE, WHITE, BLACK
 from checkers.game import Game
 from minimax.algorithm import minimax
+import time
 
 FPS = 60
 
@@ -27,24 +28,37 @@ def main():
     clock = pygame.time.Clock()
     game = Game(WIN)
 
+    white_counter = black_counter = 1
+
     while run:
         clock.tick(FPS)
 
         if game.turn == WHITE:
-            value, new_board = minimax(game.get_board(), depth, True, game, 2, WHITE)
+            white_start_time = time.time()
+            value, new_board = minimax(game.get_board(), depth, True, game, 1, WHITE)
+            white_end_time = time.time()
+            white_time = white_end_time - white_start_time
             game.ai_move(new_board)
+            print(f'White {white_counter} move time: {white_time}')
+            white_counter += 1
         elif game.turn == BLACK:
-            value, new_board = minimax(game.get_board(), depth, True, game, 1, BLACK)
+            black_start_time = time.time()
+            value, new_board = minimax(game.get_board(), depth, True, game, 2, BLACK)
+            black_end_time = time.time()
+            black_time = black_end_time - black_start_time
             game.ai_move(new_board)
+            print(f'Black {black_counter} move time: {black_time}')
+            black_counter += 1
 
         if game.winner() is not None:
             print('Winner is: ')
-            if game.winner == BLACK:
-                print('BLACK (HUMAN)')
-            elif game.winner == WHITE:
+            winner = game.winner()
+            if game.winner() == BLACK:
+                print('BLACK (AI)')
+            elif game.winner() == WHITE:
                 print('WHITE (AI)')
             else:
-                print('Error')
+                print(game.winner())
             run = False
 
         for event in pygame.event.get():

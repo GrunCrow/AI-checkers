@@ -4,7 +4,7 @@ import pygame
 from checkers.constants import WHITE, GREEN
 
 
-def minimax(position, depth, max_player, game, evaluate_function=1, ai_color=WHITE):
+def minimax(position, depth, max_player, game, evaluate_function=1, ai_colour=WHITE):
     #   position = board current position (origin)
     #   depth = how depth is the tree going to be
     #   max_player = if we are min or max the value (boolean)
@@ -13,15 +13,15 @@ def minimax(position, depth, max_player, game, evaluate_function=1, ai_color=WHI
     #   evaluation starts at the bottom of the tree
     if depth == 0 or position.winner() is not None:
         if evaluate_function == 1:
-            return position.evaluate_function_1(ai_color), position
+            return position.evaluate_function_1(ai_colour), position
         elif evaluate_function == 2:
-            return position.evaluate_function_2(ai_color), position
+            return position.evaluate_function_2(ai_colour), position
 
     if max_player:  # max the score
         max_eval = float('-inf')     # init at -inf
         best_move = None
-        for move in get_all_moves(position, ai_color, game):   # for every possible move
-            evaluation = minimax(move, depth-1, False, game, evaluate_function, ai_color)[0]    # next = min
+        for move in get_all_moves(position, ai_colour, game):   # for every possible move
+            evaluation = minimax(move, depth-1, False, game, evaluate_function, ai_colour)[0]    # next = min
             max_eval = max(max_eval, evaluation)
             if max_eval == evaluation:
                 best_move = move
@@ -30,8 +30,8 @@ def minimax(position, depth, max_player, game, evaluate_function=1, ai_color=WHI
     else:   # min the score
         min_eval = float('inf')  # init at inf for minimizing
         best_move = None
-        for move in get_all_moves(position, ai_color, game):
-            evaluation = minimax(move, depth - 1, True, game, evaluate_function, ai_color)[0]  # next = max
+        for move in get_all_moves(position, ai_colour, game):
+            evaluation = minimax(move, depth - 1, True, game, evaluate_function, ai_colour)[0]  # next = max
             min_eval = min(min_eval, evaluation)
             if min_eval == evaluation:
                 best_move = move
@@ -86,7 +86,7 @@ def get_all_moves(board, colour, game):  # check all moves of all the pieces
     for piece in board.get_all_pieces(colour):
         valid_moves = board.get_valid_moves(piece)
         for move, skip in valid_moves.items():
-            draw_moves(game, board, piece)  # show the analysis of the AI
+            # draw_moves(game, board, piece)  # show the analysis of the AI
             temp_board = deepcopy(board)    # copy to not modify original board
             temp_piece = temp_board.get_piece(piece.row, piece.col)
             new_board = simulate_move(temp_piece, move, temp_board, skip)
