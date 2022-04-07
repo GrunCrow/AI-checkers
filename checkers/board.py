@@ -1,5 +1,5 @@
 import pygame
-from .constants import BLACK, ROWS, SQUARE_SIZE, COLS, WHITE, GREY
+from .constants import BLACK, ROWS, SQUARE_SIZE, COLS, WHITE, GREY, NUMBER_OF_PAWNS
 from .piece import Piece
 
 
@@ -23,7 +23,7 @@ def subs(white_evaluation, black_evaluation, colour):
 class Board:
     def __init__(self):
         self.board = []
-        self.black_left = self.white_left = 20
+        self.black_left = self.white_left = NUMBER_OF_PAWNS
         self.black_kings = self.white_kings = 0
         self.create_board()
 
@@ -39,24 +39,38 @@ class Board:
                 else:
                     self.black_kings += 1
 
+    # heuristic functions
+
+    def heuristic_function_1(self, use_heuristic):
+        # the more kings there are -> the less value it has to have a king
+        if use_heuristic:
+            return self.white_left + self.black_left - self.black_kings - self.white_kings
+        else:
+            return 2
+
+    def heuristic_function_2(self, piece, use_heuristic):
+        if use_heuristic:
+            if piece.king:
+                return ROWS
+            else:
+                return piece.row
+        else:
+            return 0
+
     # Evaluation functions: evaluate the current state of the board
 
-    def evaluate_function_1(self, colour):  # Piece to value
+    def evaluate_function_1(self, colour, use_heuristic):  # Piece to value
         # score based on the number of pieces left
-        white_evaluation = self.white_left + self.white_kings * 2
+        white_evaluation = self.white_left + self.white_kings * self.heuristic_function_1(use_heuristic)
         if self.winner() is WHITE:
             white_evaluation += 250
-        black_evaluation = self.black_left + self.black_kings * 2
+        black_evaluation = self.black_left + self.black_kings * self.heuristic_function_1(use_heuristic)
         if self.winner() is WHITE:
             black_evaluation += 250
 
         return subs(colour, white_evaluation, black_evaluation)
 
-    def evaluate_function_2(self, colour):
-        # Pawn in the opponent's half of the board value = 7
-        # Pawn in the player's half of the board value = 5
-        # King value = 10
-        # win = 250
+    def evaluate_function_2(self, colour, use_heuristic):
 
         white_evaluation = black_evaluation = 0
         white_pieces = self.get_all_pieces(WHITE)
@@ -74,12 +88,12 @@ class Board:
                 aux += 250
 
             if white_piece.king:    # if king
-                aux += 10
+                aux += 10 + self.heuristic_function_2(white_piece, use_heuristic)
             else:
                 if white_piece.row in first_board_half:     # white pawn in white player part
-                    aux += 5
+                    aux += 5 + self.heuristic_function_2(white_piece, use_heuristic)
                 else:   # white pawn in black player's part (more value)
-                    aux += 7
+                    aux += 7 + self.heuristic_function_2(white_piece, use_heuristic)
 
             white_evaluation += aux
 
@@ -89,12 +103,12 @@ class Board:
                 aux += 250
 
             if black_piece.king:  # if king
-                aux += 10
+                aux += 10 + self.heuristic_function_2(black_piece, use_heuristic)
             else:
                 if black_piece.row in second_board_half:  # black pawn in black player part
-                    aux += 5
+                    aux += 5 + self.heuristic_function_2(black_piece, use_heuristic)
                 else:   # black pawn in white player's part (more value)
-                    aux += 7
+                    aux += 7 + self.heuristic_function_2(black_piece, use_heuristic)
 
             black_evaluation += aux
 
