@@ -3,6 +3,7 @@ import pygame
 # sizes
 WIDTH, HEIGHT = 800, 800    # window size
 ROWS, COLS = 10, 10           # board size (8x8)
+NUMBER_OF_PAWNS = (COLS/2) * ((ROWS-2)/2)   # 20
 SQUARE_SIZE = WIDTH//COLS   # board square size
 
 # RGB colours
@@ -12,10 +13,10 @@ BLUE = (0, 0, 255)
 
 # Player colours
 WHITE = (255, 255, 255)
-PLAYER_WHITE = (205, 205, 205)
+# PLAYER_WHITE = (205, 205, 205)
 
 BLACK = (0, 0, 0)
-PLAYER_BLACK = (50, 50, 50)
+# PLAYER_BLACK = (50, 50, 50)
 
 GREY = (128, 128, 128)
 
