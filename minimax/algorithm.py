@@ -4,7 +4,7 @@ import pygame
 from checkers.constants import WHITE, GREEN
 
 
-def minimax(position, depth, max_player, game, evaluate_function=1, ai_colour=WHITE):
+def minimax(position, depth, max_player, game, evaluate_function=1, ai_colour=WHITE, use_heuristic=False):
     #   position = board current position (origin)
     #   depth = how depth is the tree going to be
     #   max_player = if we are min or max the value (boolean)
@@ -13,15 +13,15 @@ def minimax(position, depth, max_player, game, evaluate_function=1, ai_colour=WH
     #   evaluation starts at the bottom of the tree
     if depth == 0 or position.winner() is not None:
         if evaluate_function == 1:
-            return position.evaluate_function_1(ai_colour), position
+            return position.evaluate_function_1(ai_colour, use_heuristic), position
         elif evaluate_function == 2:
-            return position.evaluate_function_2(ai_colour), position
+            return position.evaluate_function_2(ai_colour, use_heuristic), position
 
     if max_player:  # max the score
         max_eval = float('-inf')     # init at -inf
         best_move = None
         for move in get_all_moves(position, ai_colour):   # for every possible move
-            evaluation = minimax(move, depth-1, False, game, evaluate_function, ai_colour)[0]    # next = min
+            evaluation = minimax(move, depth-1, False, game, evaluate_function, ai_colour, use_heuristic)[0]    # next = min
             max_eval = max(max_eval, evaluation)
             if max_eval == evaluation:
                 best_move = move
@@ -31,27 +31,27 @@ def minimax(position, depth, max_player, game, evaluate_function=1, ai_colour=WH
         min_eval = float('inf')  # init at inf for minimizing
         best_move = None
         for move in get_all_moves(position, ai_colour):
-            evaluation = minimax(move, depth - 1, True, game, evaluate_function, ai_colour)[0]  # next = max
+            evaluation = minimax(move, depth - 1, True, game, evaluate_function, ai_colour, use_heuristic)[0]  # next = max
             min_eval = min(min_eval, evaluation)
             if min_eval == evaluation:
                 best_move = move
         return min_eval, best_move
 
 
-def alpha_beta_pruning(position, depth, alpha, beta, max_player, game, evaluate_function=1, ai_colour=WHITE):
+def alpha_beta_pruning(position, depth, alpha, beta, max_player, game, evaluate_function=1, ai_colour=WHITE, use_heuristic=False):
 
     #   evaluation starts at the bottom of the tree
     if depth == 0 or position.winner() is not None:
         if evaluate_function == 1:
-            return position.evaluate_function_1(ai_colour), position
+            return position.evaluate_function_1(ai_colour, use_heuristic), position
         elif evaluate_function == 2:
-            return position.evaluate_function_2(ai_colour), position
+            return position.evaluate_function_2(ai_colour, use_heuristic), position
 
     if max_player:  # max the score
         max_eval = float('-inf')     # init at -inf
         best_move = None
         for move in get_all_moves(position, ai_colour):   # for every possible move
-            evaluation = alpha_beta_pruning(move, depth-1, alpha, beta, False, game, evaluate_function, ai_colour)[0]
+            evaluation = alpha_beta_pruning(move, depth-1, alpha, beta, False, game, evaluate_function, ai_colour, use_heuristic)[0]
             max_eval = max(max_eval, evaluation)
 
             # added code for alpha beta
@@ -67,7 +67,7 @@ def alpha_beta_pruning(position, depth, alpha, beta, max_player, game, evaluate_
         min_eval = float('inf')  # init at inf for minimizing
         best_move = None
         for move in get_all_moves(position, ai_colour):
-            evaluation = alpha_beta_pruning(move, depth - 1, alpha, beta, True, game, evaluate_function, ai_colour)[0]
+            evaluation = alpha_beta_pruning(move, depth - 1, alpha, beta, True, game, evaluate_function, ai_colour, use_heuristic)[0]
             min_eval = min(min_eval, evaluation)
 
             # added code for alpha beta
