@@ -9,6 +9,9 @@ FPS = 60
 ALPHA = float('-inf')
 BETA = float('inf')
 
+use_heuristic_white = True
+use_heuristic_black = True
+
 depth = 4
 
 evaluate_function = 2
@@ -40,10 +43,10 @@ def main():
             white_start_time = time.time()
 
             # Minimax
-            # value, new_board = minimax(game.get_board(), depth, True, game, 1, WHITE)
+            # value, new_board = minimax(game.get_board(), depth, True, game, 1, WHITE, use_heuristic_white)
 
             # Alpha-Beta Pruning
-            value, new_board = alpha_beta_pruning(game.get_board(), depth, ALPHA, BETA, True, game, 1, WHITE)
+            value, new_board = alpha_beta_pruning(game.get_board(), depth, ALPHA, BETA, True, game, 1, WHITE, use_heuristic_white)
 
             white_end_time = time.time()
             white_time = white_end_time - white_start_time
@@ -54,10 +57,10 @@ def main():
             black_start_time = time.time()
 
             # Minimax
-            # value, new_board = minimax(game.get_board(), depth, True, game, 1, BLACK)
+            # value, new_board = minimax(game.get_board(), depth, True, game, 1, BLACK, use_heuristic_black)
 
             # Alpha-Beta Pruning
-            value, new_board = alpha_beta_pruning(game.get_board(), depth, ALPHA, BETA, True, game, 2, BLACK)
+            value, new_board = alpha_beta_pruning(game.get_board(), depth, ALPHA, BETA, True, game, 2, BLACK, use_heuristic_black)
 
             black_end_time = time.time()
             black_time = black_end_time - black_start_time
