@@ -3,6 +3,13 @@ from .constants import BLACK, ROWS, SQUARE_SIZE, COLS, WHITE, GREY
 from .piece import Piece
 
 
+def draw_squares(win):
+    win.fill(BLACK)
+    for row in range(ROWS):
+        for col in range(row % 2, COLS, 2):
+            pygame.draw.rect(win, WHITE, (row * SQUARE_SIZE, col * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+
+
 def subs(white_evaluation, black_evaluation, colour):
 
     if colour == WHITE:
@@ -20,22 +27,17 @@ class Board:
         self.black_kings = self.white_kings = 0
         self.create_board()
 
-    def draw_squares(self, win):
-        win.fill(BLACK)
-        for row in range(ROWS):
-            for col in range(row % 2, COLS, 2):
-                pygame.draw.rect(win, WHITE, (row * SQUARE_SIZE, col * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
-
     def move(self, piece, row, col):
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
         piece.move(row, col)
 
         if row == ROWS - 1 or row == 0:
-            piece.make_king()
-            if piece.colour == WHITE:
-                self.white_kings += 1
-            else:
-                self.black_kings += 1
+            if not piece.king:
+                piece.make_king()
+                if piece.colour == WHITE:
+                    self.white_kings += 1
+                else:
+                    self.black_kings += 1
 
     # Evaluation functions: evaluate the current state of the board
 
@@ -126,7 +128,7 @@ class Board:
                     self.board[row].append(0)
 
     def draw(self, win):
-        self.draw_squares(win)
+        draw_squares(win)
         for row in range(ROWS):
             for col in range(COLS):
                 piece = self.board[row][col]
@@ -166,7 +168,14 @@ class Board:
                 break
 
         if not white_can_move or not black_can_move:
-            return GREY  # draw will be represented with color GREY
+            # return GREY  # draw will be represented with color GREY
+            # no more draw, only win option depending on the number of pawns left (if same -> draw)
+            if self.white_left < self.black_left:
+                return BLACK
+            elif self.white_left > self.black_left:
+                return WHITE
+            else:
+                return GREY
 
         return None
 
