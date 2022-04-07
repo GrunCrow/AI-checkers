@@ -1,5 +1,5 @@
 import pygame
-from .constants import BLACK, ROWS, SQUARE_SIZE, COLS, WHITE
+from .constants import BLACK, ROWS, SQUARE_SIZE, COLS, WHITE, GREY
 from .piece import Piece
 
 
@@ -41,20 +41,19 @@ class Board:
 
     def evaluate_function_1(self, colour):  # Piece to value
         # score based on the number of pieces left
-        white_evaluation = self.white_left + self.white_kings * 0.5
+        white_evaluation = self.white_left + self.white_kings * 2
         if self.winner() is WHITE:
             white_evaluation += 250
-        black_evaluation = self.black_left + self.black_kings * 0.5
+        black_evaluation = self.black_left + self.black_kings * 2
         if self.winner() is WHITE:
             black_evaluation += 250
 
         return subs(colour, white_evaluation, black_evaluation)
 
-
     def evaluate_function_2(self, colour):
         # Pawn in the opponent's half of the board value = 7
         # Pawn in the player's half of the board value = 5
-        # King’s value = 10
+        # King value = 10
         # win = 250
 
         white_evaluation = black_evaluation = 0
@@ -63,7 +62,6 @@ class Board:
         first_board_half = []
         second_board_half = []
 
-        aux = int(ROWS/2)
         for row in range(int(ROWS/2)):
             first_board_half.append(row)
             second_board_half.append(row+5)
@@ -76,7 +74,7 @@ class Board:
             if white_piece.king:    # if king
                 aux += 10
             else:
-                if white_piece.row in first_board_half: # white pawn in white player part
+                if white_piece.row in first_board_half:     # white pawn in white player part
                     aux += 5
                 else:   # white pawn in black player's part (more value)
                     aux += 7
@@ -99,27 +97,6 @@ class Board:
             black_evaluation += aux
 
         return subs(white_evaluation, black_evaluation, colour)
-
-        '''
-        This function is built over the Piece to Value function.
-        Advanced pawns are more threatening than pawns that are on the back of the board. Therefore, since advanced 
-        pawns are much closer to become Kings, we give them extra value in our evaluation. Of course, we still evaluate 
-        kings more than any pawn.
-        Specifically:
-        We split the board into halves.
-        Pawn in the opponent's half of the board value = 7
-        Pawn in the player's half of the board value = 5
-        King’s value = 10 
-
-        This function is a small modification to the previous function in a sense that this function gives specific value of row to heuristic.
-        Pawn’s value: 5 + row number
-        King’s value = 5 + # of rows + 2'''
-
-        return evaluation_value
-
-    def evaluate(self):   # evaluate the current state of the board
-        # score based on the number of pieces left + kings 0.5 = heuristic function
-        return self.white_left - self.black_left + (self.white_kings * 0.5 - self.black_kings * 0.5)
 
     def get_all_pieces(self, colour):
         pieces = []
@@ -170,6 +147,27 @@ class Board:
             return WHITE
         elif self.white_left <= 0:
             return BLACK
+
+        # check if draw -> no more movements possible
+        white_pieces = self.get_all_pieces(WHITE)
+        black_pieces = self.get_all_pieces(BLACK)
+        white_can_move = False
+        black_can_move = False
+
+        # check if none of the players can move
+        for white_piece in white_pieces:
+            if self.get_valid_moves(white_piece):
+                white_can_move = True    # draw will be represented with color GREY
+                break
+
+        for black_pieces in black_pieces:
+            if self.get_valid_moves(black_pieces):
+                black_can_move = True
+                break
+
+        if not white_can_move or not black_can_move:
+            return GREY  # draw will be represented with color GREY
+
         return None
 
     def get_valid_moves(self, piece):
