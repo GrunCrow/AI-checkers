@@ -1,7 +1,14 @@
 from copy import deepcopy   # to avoid changing a copy of the board and modify the original object and all
 import pygame
+import random
 
-from checkers.constants import WHITE, GREEN
+from checkers.constants import WHITE, GREEN, BLACK
+
+
+def first_move(position, game, ai_colour=BLACK):
+    moves = get_all_moves(position, ai_colour, game)
+    size = moves.__len__()
+    return moves[random.randint(0, moves.__len__()-1)]
 
 
 def minimax(position, depth, max_player, game, evaluate_function=1, ai_colour=WHITE, use_heuristic=False):
@@ -20,8 +27,8 @@ def minimax(position, depth, max_player, game, evaluate_function=1, ai_colour=WH
     if max_player:  # max the score
         max_eval = float('-inf')     # init at -inf
         best_move = None
-        for move in get_all_moves(position, ai_colour):   # for every possible move
-            evaluation = minimax(move, depth-1, False, game, evaluate_function, ai_colour, use_heuristic)[0]    # next = min
+        for move in get_all_moves(position, ai_colour, game):   # for every possible move
+            evaluation = minimax(move, depth-1, False, game, evaluate_function, ai_colour, use_heuristic)[0]  # next=min
             max_eval = max(max_eval, evaluation)
             if max_eval == evaluation:
                 best_move = move
@@ -30,15 +37,15 @@ def minimax(position, depth, max_player, game, evaluate_function=1, ai_colour=WH
     else:   # min the score
         min_eval = float('inf')  # init at inf for minimizing
         best_move = None
-        for move in get_all_moves(position, ai_colour):
-            evaluation = minimax(move, depth - 1, True, game, evaluate_function, ai_colour, use_heuristic)[0]  # next = max
+        for move in get_all_moves(position, ai_colour, game):
+            evaluation = minimax(move, depth - 1, True, game, evaluate_function, ai_colour, use_heuristic)[0]  # next=max
             min_eval = min(min_eval, evaluation)
             if min_eval == evaluation:
                 best_move = move
         return min_eval, best_move
 
 
-def alpha_beta_pruning(position, depth, alpha, beta, max_player, game, evaluate_function=1, ai_colour=WHITE, use_heuristic=False):
+def alpha_beta_pruning(position, depth, alpha, beta, max_player, game, evaluate_function=1, ai_colour=WHITE, use_heuristic = False):
 
     #   evaluation starts at the bottom of the tree
     if depth == 0 or position.winner() is not None:
@@ -50,7 +57,7 @@ def alpha_beta_pruning(position, depth, alpha, beta, max_player, game, evaluate_
     if max_player:  # max the score
         max_eval = float('-inf')     # init at -inf
         best_move = None
-        for move in get_all_moves(position, ai_colour):   # for every possible move
+        for move in get_all_moves(position, ai_colour, game):   # for every possible move
             evaluation = alpha_beta_pruning(move, depth-1, alpha, beta, False, game, evaluate_function, ai_colour, use_heuristic)[0]
             max_eval = max(max_eval, evaluation)
 
@@ -66,7 +73,7 @@ def alpha_beta_pruning(position, depth, alpha, beta, max_player, game, evaluate_
     else:   # min the score
         min_eval = float('inf')  # init at inf for minimizing
         best_move = None
-        for move in get_all_moves(position, ai_colour):
+        for move in get_all_moves(position, ai_colour, game):
             evaluation = alpha_beta_pruning(move, depth - 1, alpha, beta, True, game, evaluate_function, ai_colour, use_heuristic)[0]
             min_eval = min(min_eval, evaluation)
 
@@ -87,7 +94,7 @@ def simulate_move(piece, move, board, skip):
     return board
 
 
-def get_all_moves(board, colour):  # check all moves of all the pieces
+def get_all_moves(board, colour, game):  # check all moves of all the pieces
     moves = []
     for piece in board.get_all_pieces(colour):
         valid_moves = board.get_valid_moves(piece)

@@ -1,5 +1,5 @@
 import pygame
-from .constants import BLACK, ROWS, SQUARE_SIZE, COLS, WHITE, GREY, NUMBER_OF_PAWNS
+from .constants import BLACK, ROWS, SQUARE_SIZE, COLS, WHITE, GREY, NUMBER_OF_PAWNS, RED, BLUE
 from .piece import Piece
 
 
@@ -53,7 +53,10 @@ class Board:
             if piece.king:
                 return ROWS
             else:
-                return piece.row
+                if piece.colour == WHITE:
+                    return piece.row
+                else:
+                    return ROWS - piece.row
         else:
             return 0
 
@@ -63,10 +66,14 @@ class Board:
         # score based on the number of pieces left
         white_evaluation = self.white_left + self.white_kings * self.heuristic_function_1(use_heuristic)
         if self.winner() is WHITE:
-            white_evaluation += 250
+            white_evaluation += 500
+        elif self.winner() is RED:
+            white_evaluation += 100
         black_evaluation = self.black_left + self.black_kings * self.heuristic_function_1(use_heuristic)
-        if self.winner() is WHITE:
-            black_evaluation += 250
+        if self.winner() is BLACK:
+            black_evaluation += 500
+        elif self.winner() is BLUE:
+            black_evaluation += 100
 
         return subs(colour, white_evaluation, black_evaluation)
 
@@ -85,7 +92,9 @@ class Board:
         for white_piece in white_pieces:
             aux = 0
             if self.winner() is WHITE:
-                aux += 250
+                aux += 500
+            elif self.winner() is RED:
+                aux += 100
 
             if white_piece.king:    # if king
                 aux += 10 + self.heuristic_function_2(white_piece, use_heuristic)
@@ -100,7 +109,9 @@ class Board:
         for black_piece in black_pieces:
             aux = 0
             if self.winner() is BLACK:
-                aux += 250
+                aux += 500
+            elif self.winner() is BLUE:
+                aux += 100
 
             if black_piece.king:  # if king
                 aux += 10 + self.heuristic_function_2(black_piece, use_heuristic)
@@ -184,12 +195,13 @@ class Board:
         if not white_can_move or not black_can_move:
             # return GREY  # draw will be represented with color GREY
             # no more draw, only win option depending on the number of pawns left (if same -> draw)
-            if self.white_left < self.black_left:
-                return BLACK
-            elif self.white_left > self.black_left:
-                return WHITE
+            if (self.white_left + self.white_kings * 2) < (self.black_left + self.black_kings * 2): # "WIN BLACK"
+                return BLUE #BLACK
+            elif (self.white_left + self.white_kings * 2) > (self.black_left + self.black_kings * 2): # "WIN WHITE"
+                return RED #WHITE
             else:
                 return GREY
+            #return GREY
 
         return None
 
